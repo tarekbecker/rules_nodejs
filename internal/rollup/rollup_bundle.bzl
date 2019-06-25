@@ -144,6 +144,7 @@ def write_rollup_config(ctx, plugins = [], root_dir = None, filename = "_%s.roll
             "TMPL_inputs": ",".join(["\"%s\"" % e for e in entry_points]),
             "TMPL_is_default_node_modules": "true" if is_default_node_modules else "false",
             "TMPL_module_mappings": str(mappings),
+            "TMPL_named_exports": str(ctx.attr.named_exports),
             "TMPL_node_modules_root": node_modules_root,
             "TMPL_output_format": output_format,
             "TMPL_rootDir": root_dir,
@@ -617,7 +618,7 @@ ROLLUP_ATTRS = {
     "entry_point": attr.label(
         doc = """The starting point of the application, passed as the `--input` flag to rollup.
 
-        If the entry JavaScript file belongs to the same package (as the BUILD file), 
+        If the entry JavaScript file belongs to the same package (as the BUILD file),
         you can simply reference it by its relative name to the package directory:
 
         ```
@@ -645,7 +646,7 @@ ROLLUP_ATTRS = {
 
         The rule will use the corresponding `.js` output of the ts_library rule as the entry point.
 
-        If the entry point target is a rule, it should produce a single JavaScript entry file that will be passed to the nodejs_binary rule. 
+        If the entry point target is a rule, it should produce a single JavaScript entry file that will be passed to the nodejs_binary rule.
         For example:
 
         ```
@@ -688,6 +689,12 @@ ROLLUP_ATTRS = {
         Note that you can replace a version placeholder in the license file, by using
         the special version `0.0.0-PLACEHOLDER`. See the section on stamping in the README.""",
         allow_single_file = [".txt"],
+    ),
+    "named_exports": attr.string_list_dict(
+        doc = """A dict of symbols informing rollup of objects exported by
+        modules that do not conform to commonjs, amd, or umd formats.
+        """,
+        default = {},
     ),
     "node_modules": attr.label(
         doc = """Dependencies from npm that provide some modules that must be
